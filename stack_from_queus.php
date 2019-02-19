@@ -1,68 +1,84 @@
 <?php
 
-class Stack {
-
+class Queue {
     private $storage = [];
-    private $top = 0;
+    private $head = 0;
+    private $tail = 0;
+    private $count =0;
 
     public function in($value) {
-        $this->storage[$this->top++] = $value;
+        $this->storage[$this->tail++] = $value;
+        $this->count++;
     }
 
     public function isEmpty() {
-        return $this->top === 0;
-    }
-
-    public function last() {
-        return $this->storage[$this->top-1];
+        return $this->head === $this->tail;
     }
 
     public function out() {
-        return $this->storage[--$this->top];
+        $res = $this->storage[$this->head++];
+        if($this->head > $this->tail) {
+            $this->head = $this->tail = 0;
+        }
+        $this->count--;
+        return $res;
+    }
+
+    public function size () {
+        return $this->count;
     }
 }
 
-class queueFromStacks
-{
-    private $inStack;
-    private $outStack;
+class stackFromQueues {
+    private $queue1;
+    private $queue2;
 
     public function __construct() {
-        $this->inStack = new Stack();
-        $this->outStack = new Stack();
-    }
-
-    public function in($value) {
-        $this->inStack->in($value);
+    $this->queue1 = new Queue();
+    $this->queue2 = new Queue();
     }
 
     public function isEmpty() {
-        return ($this->inStack->isEmpty() && $this->outStack->isEmpty()) === true;
+    return ($this->queue1->isEmpty() && $this->queue2->isEmpty()) === true;
+    }
+
+    public function in($value) {
+    if ($this->queue1->isEmpty()) {
+        $this->queue2->in($value);
+    } else {
+        $this->queue1->in($value);
+      }
     }
 
     public function out() {
-        if (!$this->outStack->isEmpty()) {
-            return $this->outStack->out();
-        } else {
-            while (!$this->inStack->isEmpty()) {
-                $this->outStack->in($this->inStack->out());
-            }
-            return $this->outStack->out();
+    if ($this->queue2->isEmpty()) {
+        $size = $this->queue1->size();
+        $count = 0;
+        while ($count < $size - 1) {
+            $this->queue2->in($this->queue1->out());
+            $count++;
         }
+        return $this->queue1->out();
+    } else {
+        $size = $this->queue2->size();
+        $count = 0;
+        while ($count < $size - 1) {
+            $this->queue1->in($this->queue2->out());
+            $count++;
+        }
+        return $this->queue2->out();
+      }
     }
 }
 
-$object = new queueFromStacks();
-
+$obj = new stackFromQueues();
 for ($i = 0; $i < 10; $i++) {
-    $object->in($i.'$');
+    $obj->in($i.'$');
 }
 
-var_dump($object->isEmpty());
+var_dump($obj->isEmpty());
 
 for ($i = 0; $i < 10; $i++) {
-    echo $object->out(), PHP_EOL;
+    echo $obj->out(), PHP_EOL;
 }
-
-
-var_dump($object->isEmpty());
+var_dump($obj->isEmpty());
