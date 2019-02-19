@@ -2,7 +2,7 @@
 
 class Stack {
 
-    protected $storage = [];
+    private $storage = [];
     private $top = 0;
 
     public function in($value) {
